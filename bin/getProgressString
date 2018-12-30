@@ -1,0 +1,17 @@
+#!/bin/bash
+# getProgressString <TOTAL ITEMS> <FILLED LOOK> <NOT FILLED Look> <STATUS>
+ITEMS="$1"
+FILLED_ITEM="$2"
+NOT_FILLED_ITEM="$3"
+STATUS="$4"
+FILLED_ITEMS=$(echo "((${ITEMS} * ${STATUS})/100 + 0.5) / 1" | bc)
+msg=""
+for ((i=0; i < ${FILLED_ITEMS}; i++)); do
+    msg="${msg}${FILLED_ITEM}"
+done
+msg="${msg}"
+NOT_FILLED_ITEMS=$(echo "$ITEMS - $FILLED_ITEMS" | bc)
+for ((i=0; i < ${NOT_FILLED_ITEMS}; i++)); do
+    msg="${msg}${NOT_FILLED_ITEM}"
+done
+echo "$msg"

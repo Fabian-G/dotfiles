@@ -1,0 +1,8 @@
+#!/bin/bash
+msgId="981141"
+xbacklight "$@"
+exactBrightness=$(xbacklight -get)
+brightness=$(echo "(${exactBrightness} + 0.5) / 1" | bc)
+dunstify -a "changeBrightness" -u low -i display-brightness-symbolic.symbolic -r "$msgId" \
+"Brightness: ${brightness}%" "$(getProgressString 10 "<b> </b>" " " $exactBrightness)"
+
