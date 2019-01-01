@@ -179,7 +179,7 @@
     ### Misc/Advanced ###
 
     # dmenu path.
-    dmenu = /usr/bin/dmenu -p dunst:
+    dmenu = rofi -dmenu -theme ~/.rofi_theme.rasi 
 
     # Browser for opening urls in context menu.
     browser = /usr/bin/firefox -new-tab
@@ -297,10 +297,14 @@
 #    summary = "foobar"
 #    format = ""
 
-#[history-ignore]
-#    # This notification will not be saved in history
-#    summary = "foobar"
-#    history_ignore = yes
+[history-ignore-volume]
+    # This notification will not be saved in history
+    appname = "changeVolume"
+    history_ignore = yes
+[history-ignore-brightness]
+    # This notification will not be saved in history
+    appname = "changeBrightness"
+    history_ignore = yes
 
 #[signed_on]
 #    appname = Pidgin
