@@ -1,0 +1,41 @@
+#!/bin/bash
+#Checks if battery lower than $1% and performs action $2 if thats the case
+
+msgID="911911911"
+
+
+#Check parameters
+if [[ -z "$1" || "$1" -lt 0 || "$1" -gt 100 || -z "$2" ]]; then
+    echo "Usage: checkbat <threshold> <action>"
+    exit 1
+fi
+#Check if battery is present
+if [[ -f /sys/class/power_supply/BAT0/capacity ]]; then
+    #Poll status and current capacity
+    LEVEL=$(cat /sys/class/power_supply/BAT0/capacity)
+    STATUS=$(cat /sys/class/power_supply/BAT0/status)
+    echo "Battery level at ${LEVEL}% $STATUS"
+
+    #Check if the capacity is below threshold and discharging
+    if [[ "$LEVEL" -lt "$1" && "$STATUS" == "Discharging" ]]; then
+        echo "Battery level below threshold of ${1}%. Performing action $2"
+        #Perform specified action
+        case "$2" in
+            poweroff)
+                systemctl poweroff
+                ;;
+            hibernate)
+                systemctl hibernate
+                ;;
+            *)
+                echo "ERROR: No such action"
+                ;;
+        esac
+    elif [[ "$LEVEL" -lt "$(($1 * 2))" && "$STATUS" == "Discharging" ]]; then
+        dunstify -u critical -r "$msgID" -i battery-low "Battery at ${LEVEL}%" "Please connect charger"
+    else 
+        dunstify -C "$msgID"
+    fi
+else
+    echo "No battery!"
+fi

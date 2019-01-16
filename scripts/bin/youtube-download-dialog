@@ -1,0 +1,36 @@
+#!/bin/bash
+activeID=$(xprop -root | grep _NET_ACTIVE_WINDOW\(WINDOW\)|cut -c41-)
+firefoxID=$(wmctrl -lx | grep chromium.Chromium | cut -d " " -f 1 | sed 's/0x0*/0x/')
+if ! [ "$activeID" == "$firefoxID" ]; then
+	zenity --info --text "Firefox muss das fokussierte Fenster sein!"
+	exit 1
+fi
+xdotool key ctrl+l
+xdotool key ctrl+c
+URL="$(xclip -selection clipboard -o)"
+if ! [[ "$URL" == 'https://www.youtube.com/watch?v='* ]]; then
+	zenity --info --text "Öffnen Sie ein Youtube-Video!"
+	exit 1
+fi 
+output=$(zenity --forms --title Youtube-Download-Dialog --text "$URL" --add-entry Titel --add-entry Interpret --add-entry Album)
+title=$(echo "$output" | cut -d '|' -f 1)
+artist=$(echo "$output" | cut -d '|' -f 2)
+album=$(echo "$output" | cut -d '|' -f 3)
+if [ -z "$title" ] && [ -z "$artist" ] && [ -z "$album" ]; then
+        exit 1
+fi
+
+if [ -z "$title" ] || [ -z "$artist" ] || [ -z "$album" ]; then
+	zenity --info --text "Sie müssen alle Felder ausfüllen!"
+	exit 1
+fi
+youtube-dl --no-playlist --extract-audio --audio-format m4a -o "/tmp/$title.%(ext)s" "$URL"
+mp4tags -a "$artist" -A "$album" -s "$title" "/tmp/$title.m4a"
+mkdir -p "$HOME/Music/$artist/$album"
+if [[ -e "$HOME/Music/$artist/$album/$title."* ]]; then
+	zenity --info --text "Diesen Song haben Sie bereits"
+	rm "/tmp/$title.m4a"
+	exit 1	
+fi
+mv "/tmp/$title.m4a" "$HOME/Music/$artist/$album/$title.m4a"
+zenity --info --text "Download von $artist-$title abgeschlossen"

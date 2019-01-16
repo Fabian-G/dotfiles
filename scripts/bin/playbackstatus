@@ -63,7 +63,7 @@ function showNotification() {
     elif [[ -n "$_file" ]]; then
         icon=$(getAlbumArt)
     fi
-    $notify_cmd -a cmus -i "$icon" -u normal "$1" "${_artist}-${_title}"
+    $notify_cmd -a cmus -i "$icon" -u normal "$1" "${_artist} - ${_title}"
 }
 
 # Exit if cmus is focused. 

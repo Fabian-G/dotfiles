@@ -1,0 +1,6 @@
+#!/bin/bash
+if [ -n "$(find /dev/input/by-id/ -name '*mouse*')" ]; then
+    synclient TouchpadOff=1
+else
+    synclient TouchpadOff=0
+fi

@@ -1,0 +1,10 @@
+#!/bin/bash
+touchpadDisable
+xset r rate 450 35
+setxkbmap -option caps:escape
+synclient TapButton1=1 TapButton2=2
+numlockx on
+redshift_toggle.sh silent
+compton --backend glx --vsync opengl &
+xwallpaper --daemon --zoom "$HOME/.i3/wallpaper"
+xss-lock lock &

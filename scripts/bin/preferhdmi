@@ -1,0 +1,10 @@
+#!/bin/bash
+[ -n "$(xrandr | grep "HDMI" | grep -v disconnected)" ]
+HDMI_CONNECTED=$?
+
+if [ $HDMI_CONNECTED == 0 ]; then
+    ALSA_PCM_DEVICE=3 "$@"
+else
+    "$@"
+fi
+

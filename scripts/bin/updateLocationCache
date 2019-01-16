@@ -1,0 +1,20 @@
+#!/bin/bash
+CACHE_DIR="$HOME/.cache/"
+ping -q -w 1 -c 1 "$(ip r | grep default | cut -d ' ' -f 3)" &> /dev/null 
+INET="$?"
+if [[ "$INET" == 0 ]]; then
+    PAGE="$(curl -s eigene-ip.de)"
+    LOCATION="$(echo "$PAGE" | grep 'Stadt:' | sed 's/<tr>.*<td>//;s/<\/td><\/tr>//')"
+    if [[ -z "$LOCATION" ]]; then
+        COUNTRY="$(echo "$PAGE" | grep 'Land:' | sed 's/<tr>.*<td>//;s/<\/td><\/tr>//')"
+        COMPANY="$(echo "$PAGE" | grep 'Unternehmen:' | sed 's/<tr>.*<td>//;s/<\/td><\/tr>//')"
+        LOCATION="$COMPANY/$COUNTRY"
+    fi
+    if [[ "$LOCATION" != "$(cat $CACHE_DIR/geolocation)" ]]; then
+        notify-send -i location "Geolocation updated" "New location is:\n$LOCATION"
+        echo "$LOCATION" > "$CACHE_DIR"/geolocation
+    fi
+else
+    echo "Offline" > "$CACHE_DIR"/geolocation
+fi
+

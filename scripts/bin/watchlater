@@ -1,0 +1,14 @@
+#!/bin/bash
+
+TITLE=$(youtube-dl --max-downloads 1 --get-title "$@")
+id=$(\
+    TS_ONFINISH="$HOME/.local/share/task-spooler/onfinish.sh"\
+    TS_ENV="echo NOTIFICATION_TEXT=Finished download of \\\"${TITLE}\\\";$TS_ENV" \
+    TS_SOCKET="/tmp/socket-ts.downloadq"\
+    tsp \
+        youtube-dl -f "bestvideo[height<=1080]+bestaudio/best[height<=1080]"\
+        --download-archive="$HOME/.youtube-dl.archive"\
+        -o "$HOME/Videos/watchlater/%(uploader)s/%(title)s_%(id)s.%(ext)s"\
+        "$@"
+    )
+notify-send -a watchlater -u normal -i dialog-information "Queued download of \"${TITLE}\"" "Queued as job $id"

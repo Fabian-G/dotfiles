@@ -1,0 +1,29 @@
+#!/bin/bash
+ACTIONS="poweroff\nhibernate\nsuspend\nreboot\nlock\nlogout"
+
+SELECTED_ACTION=$(echo -e "$ACTIONS" | rofi -dmenu -theme ~/.rofi_theme.rasi)
+
+case $SELECTED_ACTION in
+    poweroff)
+        systemctl poweroff
+        ;;
+    hibernate)
+        systemctl hibernate
+        ;;
+    suspend)
+        systemctl suspend
+        ;;
+    reboot)
+        systemctl reboot
+        ;;
+    lock)
+        lock
+        ;;
+    logout)
+        i3-msg exit
+        ;;
+    *)
+        echo "No such action"
+        ;;
+esac
+

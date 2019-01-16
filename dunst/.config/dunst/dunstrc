@@ -41,7 +41,7 @@
     # The transparency of the window.  Range: [0; 100].
     # This option will only work if a compositing window manager is
     # present (e.g. xcompmgr, compiz, etc.).
-    transparency = 0
+    transparency = 5
 
     # The height of the entire notification.  If the height is smaller
     # than the font height and padding combined, it will be raised
@@ -305,7 +305,14 @@
     # This notification will not be saved in history
     appname = "changeBrightness"
     history_ignore = yes
-
+[history-ignore-redshift_toggle]
+    appname = "redshift_toggle"
+    history_ignore = yes
+[history-ignore-cmus]
+    # This notification will not be saved in history
+    appname = "cmus"
+    history_ignore = yes
+    timeout = 5
 #[signed_on]
 #    appname = Pidgin
 #    summary = "*signed on*"

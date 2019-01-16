@@ -1,0 +1,55 @@
+#!/bin/bash
+CACHE_DIR="$HOME/.cache/mail_notification"
+
+# Use getReceivedDate to avoid race conditons. The extraction of this date feels kind of hacky though.
+function getReceivedDate() {
+    receivedDate=$(sed -n -e '/Received: /,$p' "$1" | grep ';' | sed 's/.*\;\s*//;1q')
+    seconds=$(date -d "$receivedDate" "+%s")
+    echo "$seconds"
+}
+
+function getDate() {
+    date=$(grep "^Date: " "$1" | sed 's/^Date: //')
+    seconds=$(date -d "$date" "+%s")
+    echo "$seconds"
+}
+
+function getFrom() {
+    from=$(grep "^From: " "$1" | sed 's/^From: //;s/<.*>//')
+    echo "$from"
+}
+
+function getSubject() {
+    subject=$(grep "^Subject: " "$1" | sed 's/^Subject: //')
+    echo "$subject"
+}
+
+function showNotification() {
+    from=$(getFrom "$1")
+    subject=$(getSubject "$1")
+    notify-send -u normal -a mail_notification -i mail-unread "New message from $from" "Subject: $subject"
+}
+
+if [[ ! -f "$CACHE_DIR" ]]; then
+    mkdir -p "$CACHE_DIR"
+fi
+
+for i in "$@"; do
+    subbed=$(realpath "$i" | sed 's|/|_|g')
+    [[ -f "$CACHE_DIR/$subbed" ]] && LAST_NOTIFICATION=$(cat "$CACHE_DIR/$subbed")
+    [[ -z "$LAST_NOTIFICATION" ]] && LAST_NOTIFICATION=0
+    NEW_LAST_NOTIFICATION="$LAST_NOTIFICATION"
+    for j in "$i"/*; do
+        if [[ "$j" == "$i/*" ]]; then
+            continue
+        fi
+        date=$(getReceivedDate "$j")
+        if [[ "$date" -gt $LAST_NOTIFICATION ]]; then
+            showNotification "$j"
+            if [[ "$date" -gt $NEW_LAST_NOTIFICATION ]]; then
+                NEW_LAST_NOTIFICATION="$date"
+            fi
+        fi
+    done
+    echo "$NEW_LAST_NOTIFICATION" > "$CACHE_DIR/$subbed"
+done

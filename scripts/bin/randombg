@@ -1,0 +1,13 @@
+#!/bin/bash
+#Change background to a random one from ~/Photos/00_Wallpapers
+
+BG_DIR="$HOME/Photos/00_Wallpapers"
+
+bgFiles=()
+while read -rd $'\0'; do
+    bgFiles+=("$REPLY")
+done < <(find "$BG_DIR" \( -type f -o -type l \) -print0)
+NEW_BG="${bgFiles[$RANDOM % ${#bgFiles[@]}]}"
+ln -s "$NEW_BG" "$HOME/.i3/wallpaper"
+xwallpaper --daemon --zoom "$HOME/.i3/wallpaper"
+echo "Setting new background $NEW_BG"
