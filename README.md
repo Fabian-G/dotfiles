@@ -36,7 +36,7 @@ Example:
 
 # How To's
 
-This sections will provide some instructions on how to set certain things up.
+These sections will provide some instructions on how to set certain things up.
 Note that I will provide a commit id with each how to. 
 That is the id of the commit which certainly contains all the needed scripts and files
 in the needed version.
