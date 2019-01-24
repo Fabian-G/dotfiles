@@ -46,6 +46,8 @@ Index:
 * [Cmus playback notification](#playback-notification-with-album-art-in-cmus)
 
 ## Playback notification with album art in cmus 
+*Note that there is an abbundance of alternatives to this one [here](https://github.com/cmus/cmus/wiki/status-display-programs)*
+
 *commit: b4045f0*
 
 ![cmus playback notification](screenshots/cmus-playback-notification.png)
