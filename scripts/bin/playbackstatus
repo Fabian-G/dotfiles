@@ -29,8 +29,8 @@ DEFAULT_ICON="emblem-music-symbolic.symbolic"
 
 # This defines the regex we will look for in the window titles when checking if cmus is focusd.
 # Needed for the "don't show notification if cmus is focused"-feature 
-TITLE_STRING="Music Player:"
-#TITLE_STRING=""
+#TITLE_STRING="Music Player:"
+TITLE_STRING=""
 
 # Use dunstify if available and pass the message id
 notify_cmd=$(which dunstify)
@@ -66,13 +66,15 @@ function showNotification() {
     $notify_cmd -a cmus -i "$icon" -u normal "$1" "${_artist} - ${_title}"
 }
 
-# Exit if cmus is focused. 
-# This method of determining if cmus is active has room for improvement
-# It relies on the title string of the cmus window being unique, so use :set format_title=... wisely.
-activeId="$(xprop -root _NET_ACTIVE_WINDOW | awk '{print $(NF)}')"
-cmusId=$(wmctrl -l | grep -E "$TITLE_STRING" | grep -v grep | head -1 | awk '{print $1}')
-if [[ "$cmusId" -eq "$activeId" ]]; then
-    exit 0
+if [[ -n "$TITLE_STRING" ]]; then
+    # Exit if cmus is focused. 
+    # This method of determining if cmus is active has room for improvement
+    # It relies on the title string of the cmus window being unique, so use :set format_title=... wisely.
+    activeId="$(xprop -root _NET_ACTIVE_WINDOW | awk '{print $(NF)}')"
+    cmusId=$(wmctrl -l | grep -E "$TITLE_STRING" | grep -v grep | head -1 | awk '{print $1}')
+    if [[ "$cmusId" -eq "$activeId" ]]; then
+        exit 0
+    fi
 fi
 
 # Create cache directory
