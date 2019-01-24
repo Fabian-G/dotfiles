@@ -1,0 +1,9 @@
+#!/usr/bin/env python
+import email
+from email.policy import SMTPUTF8
+from sys import argv
+
+filename = argv[2]
+with open(filename, 'r') as fp:
+    msg = email.message_from_file(fp, policy = email.policy.SMTPUTF8)
+print(msg[argv[1]])

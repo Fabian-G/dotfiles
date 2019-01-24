@@ -6,6 +6,8 @@ HIBERNATION_TIMEOUT=300
 function veto() {
     if [[ "$(cmus-remote -Q | grep '^status ')" == "status playing" ]]; then
         return 1
+    elif [[ -f "/tmp/i3-lock.no-hibernation" ]]; then
+        return 1
     else
         return 0
     fi

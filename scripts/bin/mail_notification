@@ -1,33 +1,16 @@
 #!/bin/bash
 CACHE_DIR="$HOME/.cache/mail_notification"
 
-# Use getReceivedDate to avoid race conditons. The extraction of this date feels kind of hacky though.
-function getReceivedDate() {
-    receivedDate=$(sed -n -e '/Received: /,$p' "$1" | grep ';' | sed 's/.*\;\s*//;1q')
-    seconds=$(date -d "$receivedDate" "+%s")
-    echo "$seconds"
-}
-
 function getDate() {
-    date=$(grep "^Date: " "$1" | sed 's/^Date: //')
+    date=$(emailHdrExtractor 'date' "$1")
     seconds=$(date -d "$date" "+%s")
     echo "$seconds"
 }
 
-function getFrom() {
-    from=$(grep "^From: " "$1" | sed 's/^From: //;s/<.*>//')
-    echo "$from"
-}
-
-function getSubject() {
-    subject=$(grep "^Subject: " "$1" | sed 's/^Subject: //')
-    echo "$subject"
-}
-
 function showNotification() {
-    from=$(getFrom "$1")
-    subject=$(getSubject "$1")
-    notify-send -u normal -a mail_notification -i mail-unread "New message from $from" "Subject: $subject"
+    from="$1"
+    subject="$2"
+    notify-send -u normal -a mail_notification -i mail-unread "New message from $from" "$subject"
 }
 
 if [[ ! -f "$CACHE_DIR" ]]; then
@@ -35,17 +18,27 @@ if [[ ! -f "$CACHE_DIR" ]]; then
 fi
 
 for i in "$@"; do
+    echo "Checking for new mail in $i"
     subbed=$(realpath "$i" | sed 's|/|_|g')
-    [[ -f "$CACHE_DIR/$subbed" ]] && LAST_NOTIFICATION=$(cat "$CACHE_DIR/$subbed")
-    [[ -z "$LAST_NOTIFICATION" ]] && LAST_NOTIFICATION=0
+    if [[ -f "$CACHE_DIR/$subbed" ]]; then
+        LAST_NOTIFICATION=$(cat "$CACHE_DIR/$subbed")
+    else
+        LAST_NOTIFICATION=0
+    fi
     NEW_LAST_NOTIFICATION="$LAST_NOTIFICATION"
     for j in "$i"/*; do
         if [[ "$j" == "$i/*" ]]; then
             continue
         fi
-        date=$(getReceivedDate "$j")
+        date=$(stat -c "%Y" "$j")
         if [[ "$date" -gt $LAST_NOTIFICATION ]]; then
-            showNotification "$j"
+            from=$(emailHdrExtractor 'from' "$j" | sed 's/<.*>//')
+            subject=$(emailHdrExtractor 'subject' "$j")
+            showNotification "$from" "$subject"
+            echo "Showing notification for message $j"
+            echo -e "\tFrom: $from"
+            echo -e "\tSubject: $subject"
+
             if [[ "$date" -gt $NEW_LAST_NOTIFICATION ]]; then
                 NEW_LAST_NOTIFICATION="$date"
             fi
