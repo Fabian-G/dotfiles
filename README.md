@@ -42,8 +42,8 @@ That is the id of the commit which certainly contains all the needed scripts and
 in the needed version.
 Chances are however that the latest commit will work just fine.
 
-## (Cmus) Playback notification with album art
-*commit: 6cb6663*
+## Playback notification with album art (Cmus) 
+*commit: b4045f0*
 
 ![cmus playback notification](screenshots/cmus-playback-notification.png)
 
