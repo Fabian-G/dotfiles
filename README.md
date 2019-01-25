@@ -36,52 +36,7 @@ Example:
 
 # How To's
 
-These sections will provide some instructions on how to set certain things up.
-Note that I will provide a commit id with each how to. 
-That is the id of the commit which certainly contains all the needed scripts and files
-in the needed version.
-Chances are however that the latest commit will work just fine.
+Check out the wiki for information on how to set certain things up.
 
-Index:
-* [Cmus playback notification](#playback-notification-with-album-art-in-cmus)
-
-## Playback notification with album art in cmus 
-*Note that if you don't like this scipt there is an abundance of alternatives to this one [here](https://github.com/cmus/cmus/wiki/status-display-programs)*
-
-*commit: b4045f0*
-
-![cmus playback notification](screenshots/cmus-playback-notification.png)
-
-Dependencies: 
-* cmus
-* ffmpegthumbnailer
-* xorg-xprop
-* wmctrl
-* Some notification daemon (works best with dunst)
-
-To set this up simply copy [playbackstatus](scripts/bin/playbackstatus) in some folder,
-which is in your `$PATH`.
-After that you want to open cmus and enter `:status_display_program=playbackstatus` 
-and it should work fine.
-
-Playback status will use *ffmpegthumbnailer* to extract the album art embedded in the audio
-file and cache it in `~/.cache/cmus-notify`.
-In case the file doesn't have embedded album art the default icon (emblem-music-symbolic.symbolic)
-is used, which must be provided by your icon theme.
-
-By default the playbackstatus script won't show a notification if cmus is in state *stopped*,
-because this would show a notification on startup. 
-If you want that notification remove the corresponding if clause right at the bottom of the 
-script.
-
-Additionally you can configure this script to not show notifications if cmus is the focused
-window.
-This feature relies on the window title of the terminal cmus is running in.
-Therefore to use this feature you must choose an appropriate window title for cmus.
-I usually use(execute in cmus):
-```bash
-set altformat_title=Music Player: %f
-set format_title=Music Player: %a - %l - %t (%y)
-```
-after that assign *"Music Player: "* to the `TITLE_STRING` variable in *playbackstatus*
-and you are done.
+![cmus notification](screenshots/cmus-playback-notification.png)
+*[Cmus playback notification with album art](https://github.com/Fabian-G/dotfiles/wiki/Cmus-playback-notification-with-album-art)*
