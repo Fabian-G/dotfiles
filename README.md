@@ -39,4 +39,5 @@ Example:
 Check out the wiki for information on how to set certain things up.
 
 ![cmus notification](screenshots/cmus-playback-notification.png)
+
 *[Cmus playback notification with album art](https://github.com/Fabian-G/dotfiles/wiki/Cmus-playback-notification-with-album-art)*
