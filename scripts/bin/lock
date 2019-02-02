@@ -1,27 +1,27 @@
 #!/bin/bash
-HIBERNATION_TIMEOUT=300
+SUSPEND_TIMEOUT=300
 
 # There are occasions when you want to lock the screen after timeout but don't shutdown
 # Make this function return 1 if you don't want to shutdown
 function veto() {
     if [[ "$(cmus-remote -Q | grep '^status ')" == "status playing" ]]; then
         return 1
-    elif [[ -f "/tmp/i3-lock.no-hibernation" ]]; then
+    elif [[ -f "/tmp/i3-lock.no-suspend" ]]; then
         return 1
     else
         return 0
     fi
 }
-waitForHibernation() {
+waitForSuspend() {
     while [ True ]; do
-        sleep "$HIBERNATION_TIMEOUT"
+        sleep "$SUSPEND_TIMEOUT"
         if veto; then
-            systemctl hibernate
+            systemctl suspend
         fi
     done
 }
 resolution=$(xrandr | grep -E ' *[0-9]*x[0-9]* *[0-9][0-9]\.[0-9][0-9]\*\+' | awk '{print $1}')
-waitForHibernation &
+waitForSuspend &
 waitPID="$!"
 trap "kill $waitPID" EXIT
 image="$HOME/.cache/i3lock/lock_${resolution}"

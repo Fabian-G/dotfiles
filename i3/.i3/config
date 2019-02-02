@@ -55,19 +55,20 @@ bindsym XF86MonBrightnessUp exec --no-startup-id "changeBrightness -inc 3"
 bindsym XF86Calculator exec --no-startup-id speedcrunch
 
 # Playback controle
-bindsym XF86AudioPlay exec --no-startup-id bash -c "cmus-remote --pause || i3-sensible-terminal -e cmus"
+bindsym XF86AudioPlay exec --no-startup-id bash -c "cmus-remote --pause || i3-sensible-terminal --class cmus -e cmus"
 bindsym XF86AudioStop exec --no-startup-id "cmus-remote --stop"
 bindsym XF86AudioNext exec --no-startup-id "cmus-remote --next"
 bindsym XF86AudioPrev exec --no-startup-id "cmus-remote --prev"
 
 # Quick access
-bindsym $mod+asciicircum exec i3-sensible-terminal -e ranger
+bindsym $mod+asciicircum exec i3-sensible-terminal -e nnn
 
 # Extra functionality
 bindsym XF86WebCam exec --no-startup-id gnome-screenshot -a -f ~/Temp/screen$RANDOM.png
 
 # Sync E-Mail accounts
-bindsym $mod+Shift+G exec --no-startup-id bash -c 'systemctl --user start offlineimap-oneshot.service && notify-send -u normal -i checkbox-checked-symbolic.symbolic "Mail sync successful" || notify-send -u normal -i dialog-error "Mail sync failed"'
+bindsym $mod+Shift+G exec --no-startup-id checkMail oneshot
+bindsym $mod+Shift+Ctrl+G exec --no-startup-id checkMail toggle
 
 bindsym $mod+B exec --no-startup-id redshift_toggle.sh
 bindsym F12 exec --no-startup-id gsimplecal
@@ -168,10 +169,9 @@ bindsym $mod+Shift+m move scratchpad
 
 # workspace_layout tabbed
 focus_follows_mouse no
+workspace_auto_back_and_forth yes
 
 # Window specific options 
-for_window[class="Zenity" title="Youtube-Download-Dialog"] floating enable
-for_window[class="Thunderbird" instance="Calendar"] floating enable
 
 new_window pixel 2
 new_float normal

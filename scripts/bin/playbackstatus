@@ -7,15 +7,11 @@
 #           :set status_display_program=playbackstatus
 #           
 #   Additionally if you want to use the "don't show notification if cmus is focused"-feature you need to
-#   choose a unique string for the window title in order to avoid
-#   mix-ups use :set format_title=.... for that
-#   After hat enter that string into the variable $TITLE_STRING below.
+#   choose a unique string for the window class in order to avoid (--class parameter when starting your terminal-emulator)
+#   Additionally you will want to set the CLASS variable below to the class you have chosen.
 #   
 #   If you don't want that feature just leave $TITLE_STRING empty
 #
-# Note that this script won't show a notification if status is "stopped" since this would trigger a notification on startup
-# If you want a notification on stopped, comment the corresponding if case at the bottom
-
 
 # Id for the notifications if you use dunstify in order to update existing notifications instead
 # of showing new ones
@@ -27,10 +23,10 @@ CACHE_DIR="$HOME/.cache/cmus-notify/"
 # Defines which icon to show if the currently playing track doesn't have embedded album art
 DEFAULT_ICON="emblem-music-symbolic.symbolic"
 
-# This defines the regex we will look for in the window titles when checking if cmus is focusd.
+# This defines the regex we will look for in the window class when checking if cmus is focusd.
 # Needed for the "don't show notification if cmus is focused"-feature 
-#TITLE_STRING="Music Player:"
-TITLE_STRING=""
+#CLASS="cmus"
+CLASS=""
 
 # Use dunstify if available and pass the message id
 notify_cmd=$(which dunstify)
@@ -66,13 +62,11 @@ function showNotification() {
     $notify_cmd -a cmus -i "$icon" -u normal "$1" "${_artist} - ${_title}"
 }
 
-if [[ -n "$TITLE_STRING" ]]; then
+if [[ -n "$CLASS" ]]; then
     # Exit if cmus is focused. 
-    # This method of determining if cmus is active has room for improvement
-    # It relies on the title string of the cmus window being unique, so use :set format_title=... wisely.
     activeId="$(xprop -root _NET_ACTIVE_WINDOW | awk '{print $(NF)}')"
-    cmusId=$(wmctrl -l | grep -E "$TITLE_STRING" | grep -v grep | head -1 | awk '{print $1}')
-    if [[ "$cmusId" -eq "$activeId" ]]; then
+    activeClass=$(xprop -id "$activeId" | grep "WM_CLASS" | grep "\"$CLASS\"")
+    if [[ -n "$activeClass" ]]; then
         exit 0
     fi
 fi
@@ -98,9 +92,6 @@ if [[ "$_status" == "playing" ]]; then
     showNotification "Now playing:"
 elif [[ "$_status" == "paused" ]]; then
     showNotification "Playback paused"
-elif [[ "$_status" == "stopped" ]]; then
-    # Don' react on stopped to avoid notification on startup
-    echo -n
 else
     showNotification "$_status"
 fi
