@@ -1,18 +1,32 @@
 #!/bin/bash
 INTERVAL="30s"
-MAIN_COLOR="#0CFAEC"
-HIGHLIGHT_COLOR="#E3E100"
+MAIN_COLOR="#304155"
+HIGHLIGHT_COLOR="#1e6d51"
+ERROR_COLOR="#FF0000"
 
 function toJson() {
     echo -n "{ \"full_text\" : \"$1\", \"color\" : \"$2\" }"
 }
 
+function AUTO_MAIL_CHECK_ACTIVE() {
+    systemctl --quiet --user is-active offlineimap-oneshot@\*.timer
+    timerActive=$?
+    systemctl --quiet --user is-failed offlineimap-oneshot@\*.service
+    failed=$?
+
+    if [[ "$timerActive" == 0 && "$failed" == 0 ]]; then
+        echo $(toJson " " "$ERROR_COLOR"),
+    elif [[ "$timerActive" == 0 ]]; then
+        echo $(toJson " " "$MAIN_COLOR"),
+    fi
+}
+
 function MAIL_COUNT() {
-    MAILBOX_DIR="$HOME/.local/share/offlineimap/"
+    MAILBOX_DIR="$HOME/.local/share/mail/"
     MAILBOXES=(\
         "mailbox/INBOX"\
         "mailbox/login"\
-        "mailbox/redirected"\
+        "mailbox/mailing_lists"\
         "uni/INBOX"\
         "uni/moodle"\
     )
@@ -27,15 +41,21 @@ function MAIL_COUNT() {
 }
 
 function PKG_COUNT() {
-    if [[ "$(cat /var/cache/pacman/pkg_count)" > 0 ]]; then
-        echo $(toJson " $(cat /var/cache/pacman/pkg_count)" "$HIGHLIGHT_COLOR"),
+    if [[ "$(cat $HOME/.cache/pacman-updates/pkgList | wc -l)" > 0 ]]; then
+        echo $(toJson " $(cat $HOME/.cache/pacman-updates/pkgList | wc -l)" "$HIGHLIGHT_COLOR"),
     fi
 }
 
 function GEO_LOCATION() {
     if [[ $(cat "$HOME/.cache/geolocation") != "Offline" ]]; then
-        echo $(toJson "$(cat $HOME/.cache/geolocation)" "$MAIN_COLOR"),
+        echo $(toJson " $(cat $HOME/.cache/geolocation)" "$MAIN_COLOR"),
     fi
+}
+
+function NETWORK() {
+    if [[ "$(nmcli network connectivity)" == full ]]; then
+        echo $(toJson "" "$MAIN_COLOR"),
+    fi 
 }
 
 function DISK_SPACE() {
@@ -73,6 +93,7 @@ while true; do
     echo "$(GEO_LOCATION)"
     echo "$(DISK_SPACE)"
     echo "$(BATTERY)"
+    echo "$(AUTO_MAIL_CHECK_ACTIVE)"
     echo "$(TIME)"
     echo "],"
     

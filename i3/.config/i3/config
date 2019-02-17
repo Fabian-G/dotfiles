@@ -12,20 +12,7 @@ set $mod Mod4
 set $primary VGA1
 set $secondary LVDS1
 
-# Font for window titles. Will also be used by the bar unless a different font
-# is used in the bar {} block below.
-font pango:monospace 8
-
-# This font is widely installed, provides lots of unicode glyphs, right-to-left
-# text rendering and scalability on retina/hidpi displays (thanks to pango).
-#font pango:DejaVu Sans Mono 8
-
-# Before i3 v4.8, we used to recommend this one as the default:
-# font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
-# The font above is very space-efficient, that is, it looks good, sharp and
-# clear in small sizes. However, its unicode glyph coverage is limited, the old
-# X core fonts rendering does not support right-to-left and this being a bitmap
-# font, it doesn’t scale on retina/hidpi displays.
+font pango:Fantasque Sans Mono 9
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
@@ -33,18 +20,16 @@ floating_modifier $mod
 # start a terminal
 bindsym $mod+Return exec i3-sensible-terminal
 
+bindsym $mod+asciicircum exec i3-sensible-terminal -e vifm
+
 # kill focused window
 bindsym $mod+q kill
 
 
 # start dmenu (a program launcher)
-# bindsym $mod+d exec dmenu_run
-# There also is the (new) i3-dmenu-desktop which only displays applications
-# shipping a .desktop file. It is a wrapper around dmenu, so you need that
-# installed.
-bindsym $mod+d exec --no-startup-id "rofi -modi drun -show drun -config ~/.rofi_theme.rasi"
-bindsym $mod+Tab exec --no-startup-id "rofi -modi window -show window -theme ~/.rofi_theme.rasi"
-bindsym $mod+p exec --no-startup-id "passmenu -theme ~/.rofi_theme.rasi -i"
+bindsym $mod+d exec --no-startup-id "rofi -modi drun -show drun -theme ~/.config/rofi/default"
+bindsym $mod+Tab exec --no-startup-id "rofi -modi window -show window -theme ~/.config/rofi/default"
+bindsym $mod+p exec --no-startup-id "passmenu -theme ~/.config/rofi/default -i"
 
 # Volume controle buttons
 bindsym XF86AudioRaiseVolume exec --no-startup-id "changeVolume 2dB+ unmute"
@@ -61,10 +46,12 @@ bindsym XF86AudioNext exec --no-startup-id "cmus-remote --next"
 bindsym XF86AudioPrev exec --no-startup-id "cmus-remote --prev"
 
 # Quick access
-bindsym $mod+asciicircum exec i3-sensible-terminal -e nnn
 
-# Extra functionality
-bindsym XF86WebCam exec --no-startup-id gnome-screenshot -a -f ~/Temp/screen$RANDOM.png
+# Screenshots
+bindsym XF86WebCam exec --no-startup-id scrot -e 'mv $f ~/Photos/screenshots' && notify-send "Screenshot saved"
+bindsym Ctrl+XF86WebCam exec --no-startup-id scrot -s -e 'mv $f ~/Photos/screenshots' && notify-send "Screenshot saved"
+bindsym Shift+XF86WebCam exec --no-startup-id scrot -d 10 -e 'mv $f ~/Photos/screenshots' && notify-send "Screenshot saved"
+bindsym Shift+Ctrl+XF86WebCam exec --no-startup-id scrot -d 10 -s -e 'mv $f ~/Photos/screenshots' && notify-send "Screenshot saved"
 
 # Sync E-Mail accounts
 bindsym $mod+Shift+G exec --no-startup-id checkMail oneshot
@@ -112,16 +99,16 @@ bindsym $mod+a focus parent
 # focus the child container
 bindsym $mod+c focus child
 
-set $ws1 "1:  "
-set $ws2 "2:  "
-set $ws3 "3:  "
-set $ws4 "4:  "
-set $ws5 "5:  "
-set $ws6 "6:  "
-set $ws7 "7:  "
-set $ws8 "8:  "
-set $ws9 "9: IX"
-set $ws10 "10: X"
+set $ws1 "1: α "
+set $ws2 "2: β "
+set $ws3 "3: γ "
+set $ws4 "4: δ "
+set $ws5 "5: ε "
+set $ws6 "6: ζ "
+set $ws7 "7: η "
+set $ws8 "8: θ "
+set $ws9 "9: ι "
+set $ws10 "10: κ "
 
 #secondary monitor workspaces
 set $ws11 "11: XI"
@@ -130,6 +117,7 @@ set $ws13 "13: XIII"
 workspace $ws11 output $secondary
 workspace $ws12 output $secondary
 workspace $ws13 output $secondary
+exec --no-startup-id i3-msg workspace $ws1
 
 # switch to workspace
 bindsym $mod+1 workspace $ws1
@@ -221,31 +209,43 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
+set $fg #304155 
+set $fg_title_foc #1e6d51
+set $bg #070c0b
+set $foc #212e3b
+set $foc2 #0e1619
+set $foc_ws #1e6d51
+set $urg #1e6d51
+set $indi #070c0b
+
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 bar {
 	tray_output primary
-	strip_workspace_numbers no
+	strip_workspace_numbers yes
   	position bottom
-	status_command "$HOME/.i3/status.sh"
+	status_command "$HOME/.config/i3/status.sh"
 	separator_symbol "<>"	
     mode hide
-    font pango:DejaVu Sans Mono 10
+    font pango:FantasqueSansMono 12
   	colors {
-   		    separator 		#252B2B
-    		background 		#252B2B
-    		statusline 		#999999
-    		focused_workspace 	#0CFAEC #0CFAEC #00000
-    		inactive_workspace 	#243938 #243938 #8888888
-    		active_workspace 	#444444 #444444 #000000
-    		urgent_workspace 	#006400 #006400 #ffffff
+   		    separator 		    $bg 
+    		background 		    $bg 
+    		statusline 		    $fg
+            #                   border  bg      text
+    		focused_workspace   $foc_ws $bg     $foc_ws
+    		inactive_workspace 	$bg     $bg     $fg
+    		active_workspace    $bg     $foc2   $fg
+    		urgent_workspace    $bg     $urg    $fg
   	}
 }
 
-client.focused 		#0CFAEC	#0CFAEC #ffffff #333333
-client.focused_inactive #01011B #01011B #888888 #333333
-client.unfocused 	#01011B #01011B #888888 #333333
-client.urgent 		#006400 #006400 #ffffff #006400
+#                       border  bg      text            indi    cborder
+client.focused          $foc    $foc    $fg_title_foc   $indi   $foc
+client.focused_inactive $foc    $foc    $fg             $indi   $bg
+client.unfocused        $bg     $bg     $fg             $indi   $bg
+client.urgent           $urg    $bg     $fg             $indi   $urg
+client.background       $bg
 
 # autostart 
-exec --no-startup-id $HOME/.i3/autostart
+exec --no-startup-id $HOME/.config/i3/autostart
