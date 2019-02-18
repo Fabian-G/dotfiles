@@ -8,7 +8,7 @@ if [[ $volume == 0 || "$mute" == "off" ]]; then
     dunstify -a "changeVolume" -u low -i audio-volume-muted -r "$msgId" "Volume muted"
 else
     dunstify -a "changeVolume" -u low -i audio-volume-high -r "$msgId" \
-    "Volume: ${volume}%" "$(getProgressString 10 "<b> </b>" " " $volume)"
+    "Volume: ${volume}%" "$(getProgressString 10 " " " " $volume)"
 fi
 
 canberra-gtk-play -i audio-volume-change -d "changeVolume" 

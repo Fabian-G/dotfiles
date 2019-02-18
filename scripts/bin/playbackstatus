@@ -25,8 +25,8 @@ DEFAULT_ICON="emblem-music-symbolic.symbolic"
 
 # This defines the regex we will look for in the window class when checking if cmus is focusd.
 # Needed for the "don't show notification if cmus is focused"-feature 
-#CLASS="cmus"
-CLASS=""
+CLASS="cmus"
+#CLASS=""
 
 # Use dunstify if available and pass the message id
 notify_cmd=$(which dunstify)

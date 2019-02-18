@@ -1,7 +1,7 @@
 #!/bin/bash
 ACTIONS="poweroff\nhibernate\nsuspend\nreboot\nlock\nlogout"
 
-SELECTED_ACTION=$(echo -e "$ACTIONS" | rofi -dmenu -theme ~/.rofi_theme.rasi)
+SELECTED_ACTION=$(echo -e "$ACTIONS" | rofi -dmenu -theme ~/.config/rofi/default)
 
 case $SELECTED_ACTION in
     poweroff)

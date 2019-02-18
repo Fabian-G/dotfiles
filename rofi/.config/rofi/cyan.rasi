@@ -1,0 +1,42 @@
+/*
+* Rofi theming properties
+*/
+* {
+    //global options
+    background-color: #222222;
+    text-color: #888888;
+}
+
+inputbar {
+    children: [entry];
+}
+
+window {
+    border: 2;
+    width: 600;
+    location: center;
+}
+
+entry {
+    background-color: #333333;
+}
+
+listview {
+    lines: 10;
+    scrollbar: false;
+    cycle: false;
+    layout: vertical;
+}
+
+element selected {
+    background-color: #0CFAEC;
+}
+
+element normal {
+    background-color: #333333;
+    text-color: #888888;
+}
+
+element alternate.normal {
+    background-color: #444444;
+}

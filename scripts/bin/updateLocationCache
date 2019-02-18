@@ -3,11 +3,20 @@ CACHE_DIR="$HOME/.cache/"
 ping -q -w 1 -c 1 "$(ip r | grep default | cut -d ' ' -f 3)" &> /dev/null 
 INET="$?"
 if [[ "$INET" == 0 ]]; then
-    PAGE="$(curl -s eigene-ip.de)"
-    LOCATION="$(echo "$PAGE" | grep 'Stadt:' | sed 's/<tr>.*<td>//;s/<\/td><\/tr>//')"
+    PAGE="$(curl -s https://iplocation.com)"
+    LOCATION="$(echo "$PAGE" | grep 'class="city"' | sed '
+        s/.*class="city"[^>]*>//;
+        s/<\/.*//
+    ' | sed 's/[[:space:]]*//')"
     if [[ -z "$LOCATION" ]]; then
-        COUNTRY="$(echo "$PAGE" | grep 'Land:' | sed 's/<tr>.*<td>//;s/<\/td><\/tr>//')"
-        COMPANY="$(echo "$PAGE" | grep 'Unternehmen:' | sed 's/<tr>.*<td>//;s/<\/td><\/tr>//')"
+        COUNTRY="$(echo "$PAGE" | grep 'class="country_name"' | sed '
+            s/.*class="country_name"[^>]*>//;
+            s/<\/.*//
+        ' | sed 's/[[:space:]]*//')"
+        COMPANY="$(echo "$PAGE" | grep 'class="company"' | sed '
+            s/.*class="company"[^>]*>//;
+            s/<\/.*//
+        ' | sed 's/[[:space:]]*//')"
         LOCATION="$COMPANY/$COUNTRY"
     fi
     if [[ "$LOCATION" != "$(cat $CACHE_DIR/geolocation)" ]]; then

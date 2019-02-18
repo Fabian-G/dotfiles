@@ -6,6 +6,7 @@ setxkbmap -option caps:escape
 synclient TapButton1=1 TapButton2=2
 numlockx on
 redshift_toggle.sh silent
-xwallpaper --zoom "$HOME/.config/i3/wallpaper"
+[[ -f "$HOME/.config/i3/wallpaper" ]] \
+    && xwallpaper --zoom "$HOME/.config/i3/wallpaper"
 compton &
 xss-lock -n dim-screen.sh lock &

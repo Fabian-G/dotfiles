@@ -1,0 +1,7 @@
+#!/bin/bash
+: ${CHECKUPDATES_DB:="${TMPDIR:-/tmp}/checkup-db-${USER}/"}
+
+mkdir -p "$CHECKUPDATES_DB"
+checkupdates > "${CHECKUPDATES_DB}/pkgList"
+
+echo "Update check complete: $(cat "${CHECKUPDATES_DB}/pkgList" | wc -l) new updates"

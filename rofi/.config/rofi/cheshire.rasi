@@ -1,0 +1,46 @@
+* {
+    font: "Fantasque Sans Mono Bold 12";
+    background-color: #00000000;
+}
+
+inputbar {
+    children: [entry];
+    margin: 0.5em 0.1em;
+}
+
+window {
+    background-color: #070c0bFF;
+    width: 20%;
+    height: 100%;
+    location: west;
+    padding: 0px 0.5em;
+}
+
+entry {
+    background-color: #172129;
+    text-color: #304155;
+    border-radius: 0.5em;
+    padding: 3px 5px;
+}
+
+listview {
+    lines: 10;
+    scrollbar: false;
+    cycle: false;
+    layout: vertical;
+}
+
+element {
+    border-radius: 0.5em;
+    padding: 5px 5px;
+}
+
+element selected {
+    background-color: #1e6d51;
+    text-color: #172129;
+}
+
+element normal {
+    background-color: #0e1619;
+    text-color: #304155;
+}

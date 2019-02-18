@@ -27,6 +27,6 @@ trap "kill $waitPID" EXIT
 image="$HOME/.cache/i3lock/lock_${resolution}"
 [[ ! -d "$HOME/.cache/i3lock" ]] && mkdir "$HOME/.cache/i3lock"
 if [[ ! -f "$image" ]]; then
-    convert "$HOME/.i3/lock.png" -resize "${resolution}^" -gravity Center -crop "${resolution}+0+0" "$image"
+    convert "$HOME/.config/i3/lock.png" -resize "${resolution}^" -gravity Center -crop "${resolution}+0+0" "$image"
 fi
 i3lock -i "$image" -f -n

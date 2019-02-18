@@ -15,9 +15,9 @@ function AUTO_MAIL_CHECK_ACTIVE() {
     failed=$?
 
     if [[ "$timerActive" == 0 && "$failed" == 0 ]]; then
-        echo $(toJson " " "$ERROR_COLOR"),
+        echo $(toJson "痢" "$ERROR_COLOR"),
     elif [[ "$timerActive" == 0 ]]; then
-        echo $(toJson " " "$MAIN_COLOR"),
+        echo $(toJson "痢" "$MAIN_COLOR"),
     fi
 }
 
