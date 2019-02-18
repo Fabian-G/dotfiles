@@ -34,10 +34,3 @@ Example:
 
 `stow --no-folding i3` will create the directory `$HOME/.i3` and create the symlink `$HOME/.i3/config -> $HOME/dotfiles/i3/.i3/config`
 
-# How To's
-
-Check out the wiki for information on how to set certain things up.
-
-![cmus notification](screenshots/cmus-playback-notification.png)
-
-*[Cmus playback notification with album art](https://github.com/Fabian-G/dotfiles/wiki/Cmus-playback-notification-with-album-art)*
