@@ -2,18 +2,12 @@
 ACCOUNTS=("uni" "mailbox")
 
 function start_sync() {
-        for i in ${ACCOUNTS[*]}; do
-            systemctl --user start offlineimap-oneshot@"$i".timer
-            echo "Starting $i"
-        done
+        systemctl --user start mbsync.timer
         notify-send -u normal -i checkbox-checked-symbolic.symbolic "Mail sync started"
 }
 
 function stop_sync() {
-        for i in ${ACCOUNTS[*]}; do
-            systemctl --user stop offlineimap-oneshot@"$i".timer
-            echo "Stopping $i"
-        done
+        systemctl --user stop mbsync.timer
         notify-send -u normal -i checkbox-checked-symbolic.symbolic "Mail sync stopped"
 }
 
@@ -25,25 +19,15 @@ case "$1" in
         stop_sync
         ;;
     toggle)
-        one_active=false
-        for i in ${ACCOUNTS[*]}; do
-            if systemctl --quiet --user is-active offlineimap-oneshot@"$i".timer; then
-                one_active=true
-            fi
-        done
-        if [[ "$one_active" == "true" ]]; then
+        if systemctl --quiet --user is-active mbsync.timer; then
             stop_sync
         else
             start_sync
         fi
         ;;
     oneshot)
-        _status=0
-        for i in ${ACCOUNTS[*]}; do
-            systemctl --user start offlineimap-oneshot@"$i".service || _status=1
-            echo "Starting $i once"
-        done
-        if [[ $_status == 0 ]]; then
+        systemctl --user start mbsync.service
+        if [[ $? == 0 ]]; then
             notify-send -u normal -i checkbox-checked-symbolic.symbolic "Mail sync successful"
         else
             notify-send -u normal -i dialog-error "Mail sync failed"

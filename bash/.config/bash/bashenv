@@ -1,0 +1,25 @@
+export TERMINAL='termite'
+export EDITOR='vim'
+
+# Task spooler
+export TS_MAXFINISHED=10
+export TS_SLOTS=1
+
+export FZF_DEFAULT_OPTS='--bind=ctrl-a:select-all,ctrl-alt-a:deselect-all --color=prompt:2,hl:10,pointer:2,marker:2'
+
+export CHECKUPDATES_DB="$HOME/.cache/pacman-updates"
+
+appendpath () {
+    case ":$PATH:" in
+        *:"$1":*)
+            ;;
+        *)
+            PATH="${PATH:+$PATH:}$1"
+    esac
+}
+appendpath "$HOME/bin"
+appendpath "$HOME/.gem/ruby/2.6.0/bin"
+unset appendpath
+
+export BASH_ENV="$HOME/.config/bash/bashenv"
+systemctl --user import-environment BASH_ENV

@@ -1,0 +1,161 @@
+#!/bin/bash
+# This file is for function that a too big for an alias and too small for a script
+# A function is a candidate for this file if
+# 1. It is less that 50 LoC
+# 2. It will only be executed manually
+
+# Colored man pages
+function man() {
+    env LESS_TERMCAP_mb=$'\E[01;31m' \
+        LESS_TERMCAP_md=$'\E[01;38;5;74m' \
+        LESS_TERMCAP_me=$'\E[0m' \
+        LESS_TERMCAP_se=$'\E[0m' \
+        LESS_TERMCAP_so=$'\E[38;5;246m' \
+        LESS_TERMCAP_ue=$'\E[0m' \
+        LESS_TERMCAP_us=$'\E[04;38;5;146m' \
+        man "$@"
+}
+export -f man
+function setAsWallpaper() {
+    : ${WALLPAPER_DIR:="$HOME/Photos/00_Wallpapers"}
+
+    mogrify -format png -path "$WALLPAPER_DIR" "$1"
+    xwallpaper --daemon --zoom "$1"
+}
+
+function cdi() {
+    while true; do
+        local dirs=$(echo .. && find -L . -maxdepth 1 -type d)
+        local nextDir=$(echo "$dirs" \
+            | fzf --reverse --height=30% --color=fg:4 --preview '
+                    echo "$(realpath {})"
+                    ls {}
+                    ')
+        [[ ${#nextDir} != 0 ]] || return 0
+        builtin cd "$nextDir" &> /dev/null
+    done
+}
+
+function hist() {
+    local startQuery
+    if [[ -n "$READLINE_LINE" && -n "$READLINE_POINT" ]]; then
+        startQuery="${READLINE_LINE:0:$READLINE_POINT}"
+    else
+        startQuery=""
+    fi
+    local cmds=$(fc -l 1 | sort -rk 2 | uniq -f 1 | sort -gr | fzf -m --reverse  --height="40%" -e --no-sort -q "$startQuery" | sort -g)
+    if [[ -n "$cmds" ]]; then
+        local cmd_count=$(echo "$cmds" | wc -l)
+        if [[ ( -n "$READLINE_LINE" || -n "$READLINE_POINT" ) && "$cmd_count" == 1 ]]; then
+            local cmd_only=$(echo "${cmds}" | cut -d ' ' -f 2-)
+            READLINE_LINE="$cmd_only"
+            READLINE_POINT="${#cmd_only}"
+        else
+            local tmpFile="$(mktemp --tmpdir 'hist.temp.XXXXXXXXX')"
+            for i in "${cmds}"; do
+                echo "$i" | cut -d ' ' -f 2- >> "$tmpFile"
+            done
+            [[ -z "$EDITOR" ]] && local EDITOR="vi"
+            $EDITOR "$tmpFile"
+            source "$tmpFile"
+            rm "$tmpFile"
+        fi
+    fi
+}
+
+function cd() {
+    if [ "$#" = "0" ]; then
+        pushd ${HOME} > /dev/null
+    else
+        pushd "$1" > /dev/null
+    fi
+    ls
+}
+
+function cb(){
+    if [ "$#" = "0" ]; then
+        popd > /dev/null
+    else
+        for i in $(seq ${1}); do
+            popd > /dev/null
+        done
+    fi
+    ls
+}
+
+function bookmark() {
+    : ${BOOKMARK_FILE:="$HOME/.local/share/bash/bookmarks"}
+
+    echo $(realpath "$1") >> "$BOOKMARK_FILE"
+    sort -u "$BOOKMARK_FILE" -o "$BOOKMARK_FILE"
+    echo Added $(realpath "$1") to bookmarks
+}
+
+function stream_newsboat_queue {
+    : ${NEWSBOAT_QUEUE:="$HOME/.local/share/newsboat/queue"}
+
+    while read file; do
+        url=$(echo $file | sed 's/".*"//')
+        mpv "$url"
+    done < "$NEWSBOAT_QUEUE" 
+    echo -n "" > "$NEWSBOAT_QUEUE"
+}
+
+function j-doc {
+    local dir="$(pwd)"
+    cd /usr/share/doc/java8-openjdk
+    firefox -new-window "$(fzf)"
+    cd "$dir"
+}
+
+function saver_off() {
+    xset s off
+    xset -dpms
+}
+
+function saver_on() {
+    xset s on
+    xset +dpms
+}
+
+function rnssim() {
+    local pkg=$(pacman -Rps $@ | sed 's/$/\\n/')
+    local sum=$(($(echo -e $pkg | wc -l) - 1))
+    echo -e "Folgende Pakete würden deinstaliert:\n"
+    echo -e \ $pkg
+    echo -en "----------------------\nGesamt:	"
+    echo $sum
+}
+
+
+function depcheck() {
+    local allPkgs=$(pacman -Qqe)
+
+    echo "Please wait..."
+    local out
+    local i
+    for i in $allPkgs; do
+        out="$out"$(pacman -Qi $i | grep "Hängt ab von\|Depends On" | sed 's/^.*: //' | wc -w)
+        out="$out $i\\n"
+    done
+    echo -e $out | sort -g
+}
+
+
+function batchScan() {
+    echo "Scanning $2 $1 files with prefix $3"
+
+    local i z 
+    for i in $(seq -w 1 $2); do
+        echo -n "Press enter to continue"
+        read z
+        if [ "$1" == "BW" ]; then
+            scanimage -d 'brother3:net1;dev0' -p --mode "Black & White" --format png > $3$i.png
+        elif [ "$1" == "CO" ]; then
+            scanimage -d "brother3:net1;dev0" -p --mode "24bit Color" --format png > $3$i.png
+        else
+            echo 'Illegal scanmode BW/CO'
+            exit 1
+        fi
+    done
+}

@@ -7,7 +7,7 @@ id=$(\
     TS_SOCKET="/tmp/socket-ts.downloadq"\
     tsp \
         youtube-dl -f "bestvideo[height<=1080]+bestaudio/best[height<=1080]"\
-        --download-archive="$HOME/.youtube-dl.archive"\
+        --download-archive="$HOME/.local/share/youtube-dl.archive"\
         -o "$HOME/Videos/watchlater/%(uploader)s/%(title)s_%(id)s.%(ext)s"\
         "$@"
     )

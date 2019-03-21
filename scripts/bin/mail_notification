@@ -1,6 +1,14 @@
 #!/bin/bash
 CACHE_DIR="$HOME/.cache/mail_notification"
 
+emailHdrExtractor() {
+    ruby <<EOF
+        require 'mail'
+        mail = Mail.read("$2")
+        puts(mail[:$1])
+EOF
+}
+
 function getDate() {
     date=$(emailHdrExtractor 'date' "$1")
     seconds=$(date -d "$date" "+%s")

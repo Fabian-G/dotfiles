@@ -1,0 +1,39 @@
+#
+# ~/.zsh_aliases
+#
+
+# General
+alias ls='ls -hl --color=auto'
+alias ll='ls -al'
+alias grep='grep --color=auto'
+alias cp='cp -v'
+alias mv='mv -v'
+alias rm='rm -v'
+alias mytop='htop -u fabian'
+alias stow='stow --no-folding'
+
+# git
+alias adog='git log --all --decorate --oneline --graph'
+alias dag='git log --decorate --all --graph'
+alias rmMerged='git branch --merged | grep -v "master" | xargs git branch -d'
+
+# Additional features
+alias sprunge="curl -F 'sprunge=<-' http://sprunge.us"
+alias youtube-m4a='youtube-dl --extract-audio --audio-format m4a --output "%(title)s.%(ext)s"'
+alias reboot_windows='sudo efibootmgr -n 000 && reboot'
+alias bkey='gpg -qd $HOME/.local/share/luks/fabian_backup.key'
+alias kkey='gpg -qd $HOME/.local/share/luks/fabian_keys.key'
+alias do_not_disturb='notify-send "DUNST_COMMAND_PAUSE"'
+alias do_disturb='notify-send "DUNST_COMMAND_RESUME"'
+alias you_rss='sed "s/channel\//feeds\/videos.xml\?channel_id=/g"' 
+alias bgo='cd $(cat $HOME/.local/share/bash/bookmarks | fzf --reverse --height="30%" -e)'
+alias bm='bookmark'
+
+# Task spooler
+alias downloadq='TS_SOCKET=/tmp/socket-ts.downloadq TS_ONFINISH=$HOME/.local/share/task-spooler/onfinish.sh tsp'
+alias playbackq='TS_SOCKET=/tmp/socket-ts.playbackq tsp'
+alias cpuq='TS_SOCKET=/tmp/socket-ts.cpuq TS_SLOTS=4 tsp'
+
+# Scanning
+alias scanBW='scanimage -d "brother3:net1;dev0" -p --mode "Black & White" --format png'
+alias scanCO='scanimage -d "brother3:net1;dev0" -p --mode "24bit Color" --format png'

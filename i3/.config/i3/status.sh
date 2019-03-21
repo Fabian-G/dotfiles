@@ -9,12 +9,15 @@ function toJson() {
 }
 
 function AUTO_MAIL_CHECK_ACTIVE() {
-    systemctl --quiet --user is-active offlineimap-oneshot@\*.timer
+    systemctl --quiet --user is-active mbsync.timer
     timerActive=$?
-    systemctl --quiet --user is-failed offlineimap-oneshot@\*.service
+    syncInProgress=$(systemctl --user is-active mbsync.service | head -1)
+    systemctl --quiet --user is-failed mbsync.service
     failed=$?
 
-    if [[ "$timerActive" == 0 && "$failed" == 0 ]]; then
+    if [[ "$syncInProgress" == "activating" ]]; then
+        echo $(toJson "痢" "$HIGHLIGHT_COLOR"),
+    elif [[ "$timerActive" == 0 && "$failed" == 0 ]]; then
         echo $(toJson "痢" "$ERROR_COLOR"),
     elif [[ "$timerActive" == 0 ]]; then
         echo $(toJson "痢" "$MAIN_COLOR"),
@@ -26,7 +29,6 @@ function MAIL_COUNT() {
     MAILBOXES=(\
         "mailbox/INBOX"\
         "mailbox/login"\
-        "mailbox/mailing_lists"\
         "uni/INBOX"\
         "uni/moodle"\
     )
@@ -41,13 +43,15 @@ function MAIL_COUNT() {
 }
 
 function PKG_COUNT() {
-    if [[ "$(cat $HOME/.cache/pacman-updates/pkgList | wc -l)" > 0 ]]; then
+    PKGLIST_FILE="$HOME/.cache/pacman-updates/pkgList"
+    if [[ -f "$PKGLIST_FILE" && "$(cat $PKGLIST_FILE | wc -l)" > 0 ]]; then
         echo $(toJson " $(cat $HOME/.cache/pacman-updates/pkgList | wc -l)" "$HIGHLIGHT_COLOR"),
     fi
 }
 
 function GEO_LOCATION() {
-    if [[ $(cat "$HOME/.cache/geolocation") != "Offline" ]]; then
+    GEO_LOCATION_FILE="$HOME/.cache/geolocation"
+    if [[ -f "$GEO_LOCATION_FILE" && $(cat "$GEO_LOCATION_FILE") != "Offline" ]]; then
         echo $(toJson " $(cat $HOME/.cache/geolocation)" "$MAIN_COLOR"),
     fi
 }
@@ -64,7 +68,9 @@ function DISK_SPACE() {
 }
 
 function BATTERY() {
-    LEVEL=$(cat /sys/class/power_supply/BAT0/capacity)
+    BATT_FILE="/sys/class/power_supply/BAT0/capacity"
+    if [[ ! -f "$BATT_FILE" ]]; then return; fi
+    LEVEL=$(cat "$BATT_FILE")
     COLOR="$MAIN_COLOR"
     if [[ "$LEVEL" -lt "20" ]]; then
         COLOR="$HIGHLIGHT_COLOR"
@@ -82,9 +88,6 @@ echo '{ "version" : 1 }'
 
 # Begin the endless array.
 echo '['
-
-# We send an empty first array of blocks to make the loop simpler:
-echo '[],'
 
 while true; do
     echo "["

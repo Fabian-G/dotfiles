@@ -1,0 +1,93 @@
+#!/bin/ruby
+# Author: Fabian-G
+# This ruby script makes it possible to add channel subscriptions to a 
+# backup file created with skytube.
+#
+# Requirements: ruby, rubyzip, ruby-sqlite3
+# Install with your package manager or do "gem install rubyzip sqlite3"
+#
+# Usage example: 
+# I use this script to keep my youtube subscriptions in newsboat in sync with my skytube subscriptions.
+# Therefore every once in a while I do the following:
+# 1. Open skytube Preferences -> Import/export -> Backup Databases
+# 2. Move backup file to your computer
+# 3. Execute 
+#    cat ~/.config/newsboat/urls | grep youtube.com | sed 's/.*channel_id=//;s/ .*//' | skytubeSubs -c SKYTUBE_BACKIP_FILE
+#   This basically filters all youtube subscriptions from your newsboat urls file (assuming ~/.config/newsboat/urls), extracts
+#   the channel ids and adds them to the database in the skytube backup.
+#   The -c flag clears the subscription database in the backup file. If you just want to add new subscriptions ommit the flag.
+# 4. Move the backup file back to your phone and do Preferences -> Import/export -> Import Backup
+#
+require 'sqlite3'
+require 'zip'
+require 'tempfile'
+require 'optparse'
+
+clear = false
+OptionParser.new do |opts|
+  opts.banner = "Usage: skytubeSubs [-c] skyTubeBackupFile"
+  opts.on('-c', '--clear', 'Clear subscription list before adding new ones') do 
+    clear = true
+  end
+
+  opts.on('-h', '--help', 'Show this help message') do
+    puts opts
+    exit
+  end
+
+end.parse!
+
+skytubeBackupFile = ARGV.pop
+raise "Specify a skytube backup file to use" if !skytubeBackupFile 
+
+dbFile = Tempfile.new('skytube_subs.db') 
+bmFile = Tempfile.new('skytube_bm.db')
+Zip::File.open(skytubeBackupFile) do |zip_file|
+  zip_file.each do |entry|
+    if entry.name == 'subs.db'
+      puts "Extracting #{entry.name} to #{dbFile.path}"
+      entry.extract(dbFile) {true}
+    elsif entry.name == 'bookmarks.db'
+      puts "Extracting #{entry.name} to #{bmFile.path}"
+      entry.extract(bmFile.path) {true}
+    end
+  end
+end
+
+begin 
+  puts "Opening subs.db"
+  db = SQLite3::Database.open "#{dbFile.path}"
+  if clear 
+    puts "Clearing database"
+    db.execute("DELETE FROM subs")
+    db.execute("DELETE FROM subsvideos")
+    db.execute("VACUUM")
+  end
+  statement = db.prepare 'INSERT OR IGNORE INTO Subs (Channel_Id) VALUES (:channel);'
+
+  db.transaction
+  while channel = $stdin.gets&.strip
+    puts "Adding channel with id #{channel}"
+    statement.execute channel
+  end
+  db.commit
+
+rescue SQLite3::Exception => e
+  puts "Exception occured"
+  puts e
+  db.rollback
+ensure
+  statement&.close
+  db&.close
+end
+
+File.delete(skytubeBackupFile)
+Zip::File.open(skytubeBackupFile, Zip::File::CREATE) do |zip_file|
+  zip_file.add('subs.db', dbFile.path)
+  zip_file.add('bookmarks.db', bmFile.path)
+end
+
+dbFile.close
+dbFile.unlink
+bmFile.close
+bmFile.unlink
